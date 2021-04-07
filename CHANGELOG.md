@@ -1,6 +1,131 @@
 Change Log
 ==========
 
+Version 2.9.0 *(2020-05-20)*
+----------------------------
+
+ * New: RxJava 3 adapter!
+
+   The Maven coordinates are `com.squareup.retrofit2:adapter-rxjava3`.
+
+   Unlike the RxJava 1 and RxJava 2 adapters, the RxJava 3 adapter's `create()` method will produce asynchronous HTTP requests by default. For synchronous requests use `createSynchronous()` and for synchronous on a scheduler use `createWithScheduler(..)`.
+
+
+Version 2.8.2 *(2020-05-18)*
+----------------------------
+
+ * Fix: Detect running on the Android platform by using system property rather than the presence of classes.
+   This ensures that even when you're running on the JVM with Android classes present on the classpath you
+   get JVM semantics.
+ * Fix: Update to OkHttp 3.14.9 which contains an associated Android platform detection fix.
+
+
+Version 2.8.1 *(2020-03-25)*
+----------------------------
+
+ * Fix: Do not access `MethodHandles.Lookup` on Android API 24 and 25. The class is only available
+   on Android API 26 and higher.
+
+
+Version 2.8.0 *(2020-03-23)*
+----------------------------
+
+ * New: Add `Call.timeout()` which returns the `okio.Timeout` of the full call.
+ * Fix: Change `Call.awaitResponse()` to accept a nullable response type.
+ * Fix: Support default methods on Java 14+. We had been working around a bug in earlier versions of
+   Java. That bug was fixed in Java 14, and the fix broke our workaround.
+
+
+Version 2.7.2 *(2020-02-24)*
+----------------------------
+
+ * Fix: Update to OkHttp 3.14.7 for compatibility with Android R (API 30).
+
+
+Version 2.7.1 *(2020-01-02)*
+----------------------------
+
+ * Fix: Support 'suspend' functions in services interfaces when using 'retrofit-mock' artifact.
+
+
+Version 2.7.0 *(2019-12-09)*
+----------------------------
+
+**This release changes the minimum requirements to Java 8+ or Android 5+.**
+See [this blog post](https://cashapp.github.io/2019-02-05/okhttp-3-13-requires-android-5) for more information on the change.
+
+ * New: Upgrade to OkHttp 3.14.4. Please see [its changelog for 3.x](https://square.github.io/okhttp/changelog_3x/).
+ * Fix: Allow service interfaces to extend other interfaces.
+ * Fix: Ensure a non-null body is returned by `Response.error`.
+
+
+Version 2.6.4 *(2020-01-02)*
+----------------------------
+
+ * Fix: Support 'suspend' functions in services interfaces when using 'retrofit-mock' artifact.
+
+
+Version 2.6.3 *(2019-12-09)*
+----------------------------
+
+ * Fix: Change mechanism for avoiding `UndeclaredThrowableException` in rare cases from using `yield`
+   an explicit dispatch which ensures that it will work even on dispatchers which do not support yielding.
+
+
+Version 2.6.2 *(2019-09-23)*
+----------------------------
+
+ * Fix: Avoid `IOException`s being wrapped in `UndeclaredThrowableException` in rare cases when using
+   `Response<..>` as a return type for Kotlin 'suspend' functions.
+
+
+Version 2.6.1 *(2019-07-31)*
+----------------------------
+
+ * Fix: Avoid `IOException`s being wrapped in `UndeclaredThrowableException` in rare cases.
+ * Fix: Include no-content `ResponseBody` for responses created by `Response.error`.
+ * Fix: Update embedded R8/ProGuard rules to not warn about nested classes used for Kotlin extensions.
+
+
+Version 2.6.0 *(2019-06-05)*
+----------------------------
+
+ * New: Support `suspend` modifier on functions for Kotlin! This allows you to express the asynchrony of HTTP requests
+   in an idiomatic fashion for the language.
+
+   ```kotlin
+   @GET("users/{id}")
+   suspend fun user(@Path("id") id: Long): User
+   ```
+
+   Behind the scenes this behaves as if defined as `fun user(...): Call<User>` and then invoked with `Call.enqueue`.
+   You can also return `Response<User>` for access to the response metadata.
+
+   Currently this integration only supports non-null response body types. Follow
+   [issue 3075](https://github.com/square/retrofit/issues/3075) for nullable type support.
+
+ * New: **`@Tag`** parameter annotation for setting tags on the underlying OkHttp `Request` object. These can be read
+   in `CallAdapter`s or OkHttp `Interceptor`s for tracing, analytics, varying behavior, and more.
+
+ * New: **`@SkipCallbackExecutor`** method annotation will result in your `Call` invoking its `Callback` on the
+   background thread on which the HTTP call was made.
+
+ * New: Support OkHttp's `Headers` type for `@HeaderMap` parameters.
+
+ * New: Add `Retrofit.Builder.baseUrl(URL)` overload.
+
+ * Fix: Add embedded R8/ProGuard rule which retains Retrofit interfaces (while still allowing obfuscation). This
+   is needed because R8 running in 'full mode' (i.e., not in ProGuard-compatibility mode) will see that there are
+   no subtypes of these interfaces and rewrite any code which references instances to null.
+ * Fix: Mark `HttpException.response()` as `@Nullable` as serializing the exception does not retain this instance.
+ * Fix: Fatal errors (such as stack overflows, out of memory, etc.) now propagate to the OkHttp `Dispatcher` thread
+   on which they are running.
+ * Fix: Ensure JAX-B converter closes the response body when an exception is thrown during deserialization.
+ * Fix: Ignore static methods when performing eager validation of interface methods.
+ * Fix: Ensure that calling `source()` twice on the `ResponseBody` passed to a `Converter` always returns the same
+   instance. Prior to the fix, intermediate buffering would cause response data to be lost.
+
+
 Version 2.5.0 *(2018-11-18)*
 ----------------------------
 
